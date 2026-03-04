@@ -7,7 +7,7 @@ import math
 # Realistic parameters for a high-performance folded paper plane
 DENSITY = 1.225
 GRAVITY = 9.81
-MASS = 0.003            # 3 grams
+MASS = 0.0125           # 12.5 grams
 CHORD = 0.10            # 10 cm mean chord
 WING_AREA = 0.017       # Projected area
 INERTIA = MASS * (CHORD**2) / 10.0 # Estimate
