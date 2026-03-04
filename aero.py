@@ -159,7 +159,7 @@ def simulate_flight(plane, v0, theta0, max_time=10.0):
     # Solver
     state0 = [0.0, 1.5, v0 * np.cos(theta0), v0 * np.sin(theta0), theta0, 0.0]
     
-    # Using 'Radau' or 'LSODA' which are robust to stiffness
+    # Using 'Radau' which is robust to stiffness
     try:
         sol = solve_ivp(
             derivatives, (0, max_time), state0,
