@@ -7,7 +7,7 @@ import math
 # Realistic parameters for a high-performance folded paper plane
 DENSITY = 1.225
 GRAVITY = 9.81
-MASS = 0.0125           # 12.5 grams
+MASS = 0.0125            # 12.5 grams
 CHORD = 0.10            # 10 cm mean chord
 WING_AREA = 0.017       # Projected area
 INERTIA = MASS * (CHORD**2) / 10.0 # Estimate
@@ -49,18 +49,16 @@ class PaperPlane:
         # 1. --- Aeroelastic Deformation ---
         # As velocity increases, wings flatten/twist (washout).
         # This reduces the Lift Slope and Pitch Trim.
-        # Washout: 1.0 at low speed, approaches 0.1 at high speed.
+        # Washout: 1.0 at low speed, approaches 0.2 at high speed.
         
-        # Safe power calculation
-        v_clamped = min(v, 100.0) # Limit checks
         
         # Lift Scale: Prevents loop by reducing lift at high speed (15m/s)
         # Transition from 1.0 to low value between 4m/s and 10m/s
-        washout = smooth_blend(v_clamped, 4.0, 12.0) * 0.8 + 0.2
+        washout = smooth_blend(v, 4.0, 12.0) * 0.8 + 0.2
         
         # Trim Scale: Prevents continuous nose-up at high speed
         # Transition trim to 0 as speed exceeds 5 m/s
-        trim_scale = smooth_blend(v_clamped, 3.0, 8.0)
+        trim_scale = smooth_blend(v, 3.0, 8.0)
         
         # 2. --- Lift Coefficient (CL) ---
         # Continuous function to avoid solver discontinuities.
@@ -88,7 +86,7 @@ class PaperPlane:
         # If speed is low (<4 m/s) and nose is high (>20 deg),
         # simulate center of pressure shift forcing nose down.
         # Use safe sigmoid for smooth transition.
-        is_slow = safe_sigmoid(4.0 - v_clamped, k=2.0) # 1 if v<4
+        is_slow = safe_sigmoid(4.0 - v, k=2.0) # 1 if v<4
         is_nose_up = safe_sigmoid(theta - 0.3, k=10.0) # 1 if theta > 0.3 rad
         stall_torque = -0.15 * is_slow * is_nose_up
         
@@ -96,7 +94,7 @@ class PaperPlane:
         
         # Damping (opposes q)
         # Limit denominator to avoid div/0
-        damp_denom = max(2.0 * v_clamped, 0.5) 
+        damp_denom = max(2.0 * v, 0.5) 
         damping = self.cm_q * (CHORD * q_rate / damp_denom)
         
         Cm = current_cm0 + (self.cm_alpha * alpha) + damping + stall_torque
@@ -159,7 +157,6 @@ def simulate_flight(plane, v0, theta0, max_time=10.0):
     # Solver
     state0 = [0.0, 1.5, v0 * np.cos(theta0), v0 * np.sin(theta0), theta0, 0.0]
     
-    # Using 'Radau' which is robust to stiffness
     try:
         sol = solve_ivp(
             derivatives, (0, max_time), state0,
