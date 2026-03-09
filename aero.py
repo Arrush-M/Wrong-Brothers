@@ -10,7 +10,7 @@ GRAVITY = 9.81
 MASS = 0.0125            # 12.5 grams
 CHORD = 0.10            # 10 cm mean chord
 WING_AREA = 0.017       # Projected area
-INERTIA = MASS * (CHORD**2) / 10.0 # Estimate
+INERTIA = MASS * (CHORD**2) # Estimate
 
 # --- Helper Functions for Numerical Safety ---
 def safe_sigmoid(x, k=10.0):
@@ -45,7 +45,7 @@ class PaperPlane:
         # Induced drag factor K = 1 / (pi * e * AR)
         self.K = 1.0 / (3.14159 * 0.8 * self.AR)
 
-    def get_forces(self, v, alpha, theta, q_rate):
+    def get_forces(self, v, alpha, theta, q_rate, aspect):
         # 1. --- Aeroelastic Deformation ---
         # As velocity increases, wings flatten/twist (washout).
         # This reduces the Lift Slope and Pitch Trim.
@@ -112,20 +112,16 @@ def simulate_flight(plane, v0, theta0, max_time=10.0):
         # Stop if on ground (or slightly underground due to step)
         if y < 0:
             return [0.0]*6
-            
-        # Stop if stopped
-        if v < 0.1:
-            return [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
 
         gamma = np.arctan2(vy, vx)
         # Normalized Angle of Attack
         alpha = (theta - gamma + np.pi) % (2*np.pi) - np.pi
         
         # Aerodynamics
-        CL, CD, Cm = plane.get_forces(v, alpha, theta, omega)
+        CL, CD, Cm = plane.get_forces(v, alpha, theta, omega, plane.AR)
         
-        # Dynamic Pressure
-        Q = 0.5 * DENSITY * v**2 * WING_AREA
+        # Dynamic Pressure * wing area
+        Q = 0.5 * DENSITY * v**2 * WING_AREA / plane.AR # True wing area, since WING_AREA is placeholder
         
         # Forces (Inertial Frame)
         # Lift acts perpendicular to Velocity (-vy, vx)
@@ -134,7 +130,7 @@ def simulate_flight(plane, v0, theta0, max_time=10.0):
         vn_x, vn_y = vx/v, vy/v
         
         Lift = Q * CL
-        Drag = Q * CD
+        Drag = Q * CD * plane.AR # Wing area vs cross-sectional area scaling
         
         Fx = -Drag * vn_x - Lift * vn_y
         Fy = -Drag * vn_y + Lift * vn_x - MASS * GRAVITY
@@ -172,31 +168,36 @@ def simulate_flight(plane, v0, theta0, max_time=10.0):
 
 # --- Setup Planes ---
 def suzanne(aspect):
-    return PaperPlane("Suzanne", cm0=0.03, cd0=0.02, cm_alpha=-0.2, cm_q=-3.0, aspect_ratio=aspect)
+    return PaperPlane("Suzanne", cm0=0.04, cd0=0.04*(aspect/2 + 2/aspect), cm_alpha=-0.2, cm_q=-3.0, aspect_ratio=aspect)
+    # cd0 scaled with this function to reflect wing drag and gap between fuselage layers
 
-# Alkonost: More stable, faster recovery.
 def alkonost(aspect):
-    return PaperPlane("Alkonost", cm0=0.02, cd0=0.025, cm_alpha=-0.3, cm_q=-4.0, aspect_ratio=aspect)
+    return PaperPlane("Alkonost", cm0=0.02, cd0=0.04*(aspect/3 + 2.5/aspect), cm_alpha=-0.3, cm_q=-4.0, aspect_ratio=aspect)
 
 # --- Visualization ---
 plt.figure(figsize=(12, 7))
 
-# 1. Hard Throws (15 m/s)
-# Should climb, slow down ballistically (no loop), then glide.
-x1, y1 = simulate_flight(suzanne(1.6), v0=25.0, theta0=np.pi/6, max_time=25)
-plt.plot(x1, y1, 'b-', linewidth=2, label="Suzanne Hard (25 m/s)")
+ranges_suzanne = []
+for twentyasp in range(20, 101):
+    plane = suzanne(twentyasp/20)
+    x, y = simulate_flight(plane, v0=25.0, theta0=0.64, max_time=50)
+    ranges_suzanne.append([twentyasp/20, x[-1]])
 
-# 2. Soft Throws (Optimization Check)
-# Should float gently.
-x3, y3 = simulate_flight(suzanne(1.6), v0=5.0, theta0=np.pi/6, max_time=15)
-plt.plot(x3, y3, 'g--', linewidth=2, label="Suzanne Soft (5 m/s)")
+ranges_alkonost = []
+for twentyasp in range(20, 101):
+    plane = alkonost(twentyasp/20)
+    x, y = simulate_flight(plane, v0=25.0, theta0=0.64, max_time=50)
+    ranges_alkonost.append([twentyasp/20, x[-1]])
 
-plt.title("Paper Aeroplane Trajectory")
-plt.xlabel("Distance (m)")
-plt.ylabel("Height (m)")
+plt.plot([r[0] for r in ranges_suzanne], [r[1] for r in ranges_suzanne], 'b-', linewidth=2)
+plt.plot([r[0] for r in ranges_alkonost], [r[1] for r in ranges_alkonost], 'r-', linewidth=2)
+
+plt.title("Range vs Aspect Ratio")
+plt.xlabel("Aspect Ratio")
+plt.ylabel("Range (m)")
 plt.axhline(0, color='black', linewidth=1)
 plt.grid(True, linestyle='--')
-plt.axis('equal')
-plt.legend()
-plt.ylim(bottom=-0.5)
+plt.xlim(0, 6)
+plt.ylim(10, 31.62)
+plt.legend(['Suzanne', 'Alkonost'])
 plt.show()
