@@ -1,4 +1,4 @@
 # Wrong-Brothers
 Ensemble Physics Fight Question 1
 
-Optimization of a paper plane given aspect ratio and load for distance. Parameters: folding (from a fixed set), wing area, load distribution. The Euler method is used for numerical integration of lift, skin friction, form drag, weight, and torques.
+Optimization of a paper plane for range given load to be carried. Parameters: folding (from a fixed set), aspect ratio, load distribution (through C_m,0). The Radau method is used for numerical integration of lift, skin friction, form drag, weight, and torques.
