@@ -3,9 +3,21 @@ import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 
 data = []
+filename = ""
+
+choice = int(input("Enter choice of plane: "))
+
+if choice == 0:
+    filename = "suzanne.csv"
+elif choice == 1:
+    filename = "alkonost.csv"
+elif choice == 2:
+    filename = "super_dart.csv"
+elif choice == 3:
+    filename = "chinese.csv"
 
 # Read CSV
-with open("suzanne.csv", "r") as f:
+with open(filename, "r") as f:
     reader = csv.reader(f)
     for row in reader:
         data.append([float(x) for x in row])

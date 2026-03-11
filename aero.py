@@ -133,60 +133,65 @@ def suzanne(aspect, mass):
     return PaperPlane("Suzanne", cm0=0.03, cd0=0.03*(aspect/3.5 + 3/aspect), cm_alpha=-0.2, cm_q=-3.0, aspect_ratio=aspect, mass=mass)
     # cd0 scaled with this function to reflect wing drag and gap between fuselage layers
 
-def alkonost(aspect):
-    return PaperPlane("Alkonost", cm0=0.025, cd0=0.03*(aspect/3 + 3/aspect), cm_alpha=-0.3, cm_q=-4.0, aspect_ratio=aspect)
+def alkonost(aspect, mass):
+    return PaperPlane("Alkonost", cm0=0.025, cd0=0.03*(aspect/3 + 3/aspect), cm_alpha=-0.3, cm_q=-4.0, aspect_ratio=aspect, mass=mass)
 
-def super_dart(aspect):
-    return PaperPlane("Super Dart", cm0=0.02, cd0=0.02*(aspect/4 + 4/aspect), cm_alpha=-0.3, cm_q=-4.0, aspect_ratio=aspect)
+def super_dart(aspect, mass):
+    return PaperPlane("Super Dart", cm0=0.02, cd0=0.02*(aspect/4 + 4/aspect), cm_alpha=-0.3, cm_q=-4.0, aspect_ratio=aspect, mass=mass)
 
-def chinese_glider(aspect):
-    return PaperPlane("Chinese Glider", cm0=0.03, cd0=0.03*(aspect/3 + 3/aspect), cm_alpha=-0.2, cm_q=-3.0, aspect_ratio=aspect)
+def chinese_glider(aspect, mass):
+    return PaperPlane("Chinese Glider", cm0=0.03, cd0=0.03*(aspect/3 + 3/aspect), cm_alpha=-0.2, cm_q=-3.0, aspect_ratio=aspect, mass=mass)
 
-ranges_suzanne = []
-for i in range(0, 4):
-    mass = MASS + 0.01*i
-    for asp in np.linspace(0.8, 5, 52):
-        for theta in np.linspace(0.5, 1, 20):
-            plane = suzanne(asp, mass)
-            x, y = simulate_flight(plane, v0=20.0, theta0=theta, max_time=50)
-            ranges_suzanne.append([asp, x[-1], theta, mass])
-            print([asp, x[-1], theta, mass])
+choice = int(input("Enter plane no: "))
+if choice == 0:
+    ranges_suzanne = []
+    for i in range(0, 4):
+        mass = MASS + 0.01*i
+        for asp in np.linspace(0.8, 5, 52):
+            for theta in np.linspace(0.5, 1, 20):
+                plane = suzanne(asp, mass)
+                x, y = simulate_flight(plane, v0=20.0, theta0=theta, max_time=50)
+                ranges_suzanne.append([asp, x[-1], theta, mass])
+                print([asp, x[-1], theta, mass])
 
-'''
+    np.savetxt("suzanne.csv", ranges_suzanne, delimiter=",")
+
+elif choice == 1:
     ranges_alkonost = []
-    for twentyasp in range(15, 101):
-        plane = alkonost(twentyasp/20)
-        x, y = simulate_flight(plane, v0=20.0, theta0=0.64, max_time=50)
-        ranges_alkonost.append([twentyasp/20, x[-1]])
+    for i in range(0, 4):
+        mass = MASS + 0.01*i
+        for asp in np.linspace(0.8, 5, 52):
+            for theta in np.linspace(0.5, 1, 20):
+                plane = alkonost(asp, mass)
+                x, y = simulate_flight(plane, v0=20.0, theta0=theta, max_time=50)
+                ranges_alkonost.append([asp, x[-1], theta, mass])
+                print([asp, x[-1], theta, mass])
 
-    ranges_super_dart = []
-    for twentyasp in range(15, 101):
-        plane = super_dart(twentyasp/20)
-        x, y = simulate_flight(plane, v0=20.0, theta0=0.64, max_time=50)
-        ranges_super_dart.append([twentyasp/20, x[-1]])
+    np.savetxt("alkonost.csv", ranges_alkonost, delimiter=",")
 
-    ranges_chinese_glider = []
-    for twentyasp in range(15, 101):
-        plane = chinese_glider(twentyasp/20)
-        x, y = simulate_flight(plane, v0=20.0, theta0=0.64, max_time=50)
-        ranges_chinese_glider.append([twentyasp/20, x[-1]])
+elif choice == 2:
+    ranges_super = []
+    for i in range(0, 4):
+        mass = MASS + 0.01*i
+        for asp in np.linspace(0.8, 5, 52):
+            for theta in np.linspace(0.5, 1, 20):
+                plane = super_dart(asp, mass)
+                x, y = simulate_flight(plane, v0=20.0, theta0=theta, max_time=50)
+                ranges_super.append([asp, x[-1], theta, mass])
+                print([asp, x[-1], theta, mass])
 
-    plt.plot([r[0] for r in ranges_suzanne], [r[1] for r in ranges_suzanne], 'b-', linewidth=2)
+    np.savetxt("super_dart.csv", ranges_super, delimiter=",")
 
-    plt.plot([r[0] for r in ranges_alkonost], [r[1] for r in ranges_alkonost], 'r-', linewidth=2)
-    plt.plot([r[0] for r in ranges_super_dart], [r[1] for r in ranges_super_dart], 'g-', linewidth=2)
-    plt.plot([r[0] for r in ranges_chinese_glider], [r[1] for r in ranges_chinese_glider], 'm-', linewidth=2)
-    plt.title("Range vs Aspect Ratio")
-    plt.xlabel("Aspect Ratio")
-    plt.ylabel("Range (m)")
-    plt.axhline(0, color='black', linewidth=1)
-    plt.grid(True, linestyle='--')
-    plt.xlim(0, 6)
-    plt.legend(['Suzanne', 'Alkonost', 'Super Dart', 'Chinese Glider'])
-    plt.show()
-'''
+elif choice == 3:
+    ranges_chinese = []
+    for i in range(0, 4):
+        mass = MASS + 0.01*i
+        for asp in np.linspace(0.8, 5, 52):
+            for theta in np.linspace(0.5, 1, 20):
+                plane = chinese_glider(asp, mass)
+                x, y = simulate_flight(plane, v0=20.0, theta0=theta, max_time=50)
+                ranges_chinese.append([asp, x[-1], theta, mass])
+                print([asp, x[-1], theta, mass])
 
-np.savetxt("suzanne.csv", ranges_suzanne, delimiter=",")
+    np.savetxt("chinese.csv", ranges_chinese, delimiter=",")
 
-fig = plt.figure()
-ax = fig.add_subplot(projection='3d')
