@@ -7,7 +7,7 @@ DENSITY = 1.18
 GRAVITY = 9.78
 MASS = 0.0125         
 CHORD = 0.20            
-WING_AREA = 0.04       
+WING_AREA = 0.04      
 INERTIA = MASS * (CHORD**2) / 12
 
 # Helper Functions for Numerical Safety
