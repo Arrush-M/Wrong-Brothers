@@ -4,11 +4,10 @@ from scipy.integrate import solve_ivp
 
 # Physical Constants (All in SI Units)
 DENSITY = 1.18
-GRAVITY = 9.78
-MASS = 0.0125         
+GRAVITY = 9.78                                          
+MASS = 0.0125       
 CHORD = 0.20            
 WING_AREA = 0.04      
-INERTIA = MASS * (CHORD**2) / 12
 
 # Helper Functions for Numerical Safety
 def safe_sigmoid(x, k=10.0):
@@ -30,7 +29,7 @@ def smooth_blend(v_curr, v_start, v_end):
     return 1.0 - (t * t * (3.0 - 2.0 * t)) # Cubic ease-in-out
 
 class PaperPlane:
-    def __init__(self, name, cm0, cd0, cm_alpha, cm_q, aspect_ratio):
+    def __init__(self, name, cm0, cd0, cm_alpha, cm_q, aspect_ratio, mass=MASS):
         self.name = name
         self.cm0_base = cm0
         self.cd0 = cd0
@@ -39,6 +38,8 @@ class PaperPlane:
         self.AR = aspect_ratio
         # Induced drag factor K = 1 / (pi * e * AR)
         self.K = 1.0 / (3.14159 * 0.8 * self.AR)
+        self.mass = mass
+        self.inertia = mass * (CHORD**2) / 12
 
     def get_forces(self, v, alpha, theta, q_rate, aspect):
         washout = smooth_blend(v, 4.0, 12.0) * 0.8 + 0.2
@@ -97,13 +98,13 @@ def simulate_flight(plane, v0, theta0, max_time=10.0):
         Drag = Q * CD * plane.AR # Wing area vs cross-sectional area scaling
         
         Fx = -Drag * vn_x - Lift * vn_y
-        Fy = -Drag * vn_y + Lift * vn_x - MASS * GRAVITY
+        Fy = -Drag * vn_y + Lift * vn_x - plane.mass * GRAVITY
         
         Moment = Q * CHORD * Cm
 
-        ax = Fx / MASS
-        ay = Fy / MASS
-        alpha_acc = Moment / INERTIA
+        ax = Fx / plane.mass
+        ay = Fy / plane.mass
+        alpha_acc = Moment / plane.inertia
         
         return [vx, vy, ax, ay, omega, alpha_acc]
 
@@ -128,8 +129,8 @@ def simulate_flight(plane, v0, theta0, max_time=10.0):
         return [0], [0]
 
 # --- Setup Planes ---
-def suzanne(aspect):
-    return PaperPlane("Suzanne", cm0=0.03, cd0=0.03*(aspect/3.5 + 3/aspect), cm_alpha=-0.2, cm_q=-3.0, aspect_ratio=aspect)
+def suzanne(aspect, mass):
+    return PaperPlane("Suzanne", cm0=0.03, cd0=0.03*(aspect/3.5 + 3/aspect), cm_alpha=-0.2, cm_q=-3.0, aspect_ratio=aspect, mass=mass)
     # cd0 scaled with this function to reflect wing drag and gap between fuselage layers
 
 def alkonost(aspect):
@@ -141,15 +142,15 @@ def super_dart(aspect):
 def chinese_glider(aspect):
     return PaperPlane("Chinese Glider", cm0=0.03, cd0=0.03*(aspect/3 + 3/aspect), cm_alpha=-0.2, cm_q=-3.0, aspect_ratio=aspect)
 
-# --- Visualization ---
-plt.figure(figsize=(12, 7))
-
 ranges_suzanne = []
-for asp in np.linspace(0.8, 5, 52):
-    for theta in np.linspace(0.5, 1, 20):
-        plane = suzanne(asp)
-        x, y = simulate_flight(plane, v0=20.0, theta0=theta, max_time=50)
-        ranges_suzanne.append([asp, x[-1], theta, 0.1])
+for i in range(0, 4):
+    mass = MASS + 0.01*i
+    for asp in np.linspace(0.8, 5, 52):
+        for theta in np.linspace(0.5, 1, 20):
+            plane = suzanne(asp, mass)
+            x, y = simulate_flight(plane, v0=20.0, theta0=theta, max_time=50)
+            ranges_suzanne.append([asp, x[-1], theta, mass])
+            print([asp, x[-1], theta, mass])
 
 '''
     ranges_alkonost = []
