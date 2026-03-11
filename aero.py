@@ -41,7 +41,6 @@ class PaperPlane:
         self.K = 1.0 / (3.14159 * 0.8 * self.AR)
 
     def get_forces(self, v, alpha, theta, q_rate, aspect):
-
         washout = smooth_blend(v, 4.0, 12.0) * 0.8 + 0.2
 
         trim_scale = smooth_blend(v, 3.0, 8.0)
@@ -146,39 +145,47 @@ def chinese_glider(aspect):
 plt.figure(figsize=(12, 7))
 
 ranges_suzanne = []
-for twentyasp in range(15, 101):
-    plane = suzanne(twentyasp/20)
-    x, y = simulate_flight(plane, v0=20.0, theta0=0.64, max_time=50)
-    ranges_suzanne.append([twentyasp/20, x[-1]])
+for asp in np.linspace(0.8, 5, 52):
+    for theta in np.linspace(0.5, 1, 20):
+        plane = suzanne(asp)
+        x, y = simulate_flight(plane, v0=20.0, theta0=theta, max_time=50)
+        ranges_suzanne.append([asp, x[-1], theta, 0.1])
 
-ranges_alkonost = []
-for twentyasp in range(15, 101):
-    plane = alkonost(twentyasp/20)
-    x, y = simulate_flight(plane, v0=20.0, theta0=0.64, max_time=50)
-    ranges_alkonost.append([twentyasp/20, x[-1]])
+'''
+    ranges_alkonost = []
+    for twentyasp in range(15, 101):
+        plane = alkonost(twentyasp/20)
+        x, y = simulate_flight(plane, v0=20.0, theta0=0.64, max_time=50)
+        ranges_alkonost.append([twentyasp/20, x[-1]])
 
-ranges_super_dart = []
-for twentyasp in range(15, 101):
-    plane = super_dart(twentyasp/20)
-    x, y = simulate_flight(plane, v0=20.0, theta0=0.64, max_time=50)
-    ranges_super_dart.append([twentyasp/20, x[-1]])
+    ranges_super_dart = []
+    for twentyasp in range(15, 101):
+        plane = super_dart(twentyasp/20)
+        x, y = simulate_flight(plane, v0=20.0, theta0=0.64, max_time=50)
+        ranges_super_dart.append([twentyasp/20, x[-1]])
 
-ranges_chinese_glider = []
-for twentyasp in range(15, 101):
-    plane = chinese_glider(twentyasp/20)
-    x, y = simulate_flight(plane, v0=20.0, theta0=0.64, max_time=50)
-    ranges_chinese_glider.append([twentyasp/20, x[-1]])
+    ranges_chinese_glider = []
+    for twentyasp in range(15, 101):
+        plane = chinese_glider(twentyasp/20)
+        x, y = simulate_flight(plane, v0=20.0, theta0=0.64, max_time=50)
+        ranges_chinese_glider.append([twentyasp/20, x[-1]])
 
-plt.plot([r[0] for r in ranges_suzanne], [r[1] for r in ranges_suzanne], 'b-', linewidth=2)
-plt.plot([r[0] for r in ranges_alkonost], [r[1] for r in ranges_alkonost], 'r-', linewidth=2)
-plt.plot([r[0] for r in ranges_super_dart], [r[1] for r in ranges_super_dart], 'g-', linewidth=2)
-plt.plot([r[0] for r in ranges_chinese_glider], [r[1] for r in ranges_chinese_glider], 'm-', linewidth=2)
+    plt.plot([r[0] for r in ranges_suzanne], [r[1] for r in ranges_suzanne], 'b-', linewidth=2)
 
-plt.title("Range vs Aspect Ratio")
-plt.xlabel("Aspect Ratio")
-plt.ylabel("Range (m)")
-plt.axhline(0, color='black', linewidth=1)
-plt.grid(True, linestyle='--')
-plt.xlim(0, 6)
-plt.legend(['Suzanne', 'Alkonost', 'Super Dart', 'Chinese Glider'])
-plt.show()
+    plt.plot([r[0] for r in ranges_alkonost], [r[1] for r in ranges_alkonost], 'r-', linewidth=2)
+    plt.plot([r[0] for r in ranges_super_dart], [r[1] for r in ranges_super_dart], 'g-', linewidth=2)
+    plt.plot([r[0] for r in ranges_chinese_glider], [r[1] for r in ranges_chinese_glider], 'm-', linewidth=2)
+    plt.title("Range vs Aspect Ratio")
+    plt.xlabel("Aspect Ratio")
+    plt.ylabel("Range (m)")
+    plt.axhline(0, color='black', linewidth=1)
+    plt.grid(True, linestyle='--')
+    plt.xlim(0, 6)
+    plt.legend(['Suzanne', 'Alkonost', 'Super Dart', 'Chinese Glider'])
+    plt.show()
+'''
+
+np.savetxt("suzanne.csv", ranges_suzanne, delimiter=",")
+
+fig = plt.figure()
+ax = fig.add_subplot(projection='3d')
