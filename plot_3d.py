@@ -25,8 +25,8 @@ with open(filename, "r") as f:
 n = len(data[0])
 
 x = [row[0] for row in data]
-y = [row[1] for row in data]
-z = [row[2] for row in data]
+z = [row[1] for row in data]
+y = [row[2] for row in data]
 
 fig = plt.figure()
 ax = fig.add_subplot(projection="3d")
@@ -39,7 +39,7 @@ else:
     ax.scatter(x, y, z)
 
 ax.set_xlabel("Aspect Ratio")
-ax.set_ylabel("Range")
-ax.set_zlabel("Initial Angle")
+ax.set_zlabel("Range")
+ax.set_ylabel("Initial Angle")
 
 plt.show()
