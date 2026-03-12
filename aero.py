@@ -5,7 +5,7 @@ from scipy.integrate import solve_ivp
 # Physical Constants (All in SI Units)
 DENSITY = 1.18
 GRAVITY = 9.78                                          
-MASS = 0.0125       
+MASS = 0.0047       
 CHORD = 0.20            
 WING_AREA = 0.04      
 
@@ -130,24 +130,24 @@ def simulate_flight(plane, v0, theta0, max_time=10.0):
 
 # --- Setup Planes ---
 def suzanne(aspect, mass):
-    return PaperPlane("Suzanne", cm0=0.03, cd0=0.03*(aspect/3.5 + 3/aspect), cm_alpha=-0.2, cm_q=-3.0, aspect_ratio=aspect, mass=mass)
+    return PaperPlane("Suzanne", cm0=0.03, cd0=0.005*(aspect/2.5 + 2/aspect), cm_alpha=-0.2, cm_q=-3.0, aspect_ratio=aspect, mass=mass)
     # cd0 scaled with this function to reflect wing drag and gap between fuselage layers
 
-def alkonost(aspect, mass):
-    return PaperPlane("Alkonost", cm0=0.025, cd0=0.03*(aspect/3 + 3/aspect), cm_alpha=-0.3, cm_q=-4.0, aspect_ratio=aspect, mass=mass)
+def nighthawk(aspect, mass):
+    return PaperPlane("nighthawk", cm0=0.025, cd0=0.005*(aspect/3 + 2.5/aspect), cm_alpha=-0.3, cm_q=-4.0, aspect_ratio=aspect, mass=mass)
 
 def super_dart(aspect, mass):
-    return PaperPlane("Super Dart", cm0=0.02, cd0=0.02*(aspect/4 + 4/aspect), cm_alpha=-0.3, cm_q=-4.0, aspect_ratio=aspect, mass=mass)
+    return PaperPlane("Super Dart", cm0=0.02, cd0=0.004*(aspect/4 + 4/aspect), cm_alpha=-0.3, cm_q=-4.0, aspect_ratio=aspect, mass=mass)
 
-def chinese_glider(aspect, mass):
-    return PaperPlane("Chinese Glider", cm0=0.03, cd0=0.03*(aspect/3 + 3/aspect), cm_alpha=-0.2, cm_q=-3.0, aspect_ratio=aspect, mass=mass)
+def firefly(aspect, mass):
+    return PaperPlane("Firefly", cm0=0.03, cd0=0.005*(aspect/2.5 + 2/aspect), cm_alpha=-0.2, cm_q=-3.0, aspect_ratio=aspect, mass=mass)
 
 choice = int(input("Enter plane no: "))
 if choice == 0:
     ranges_suzanne = []
     for i in range(0, 4):
         mass = MASS + 0.001*i
-        for asp in np.arange(0.8, 5, 0.1):
+        for asp in np.arange(1, 5, 0.1):
             for theta in np.arange(0.5, 1, 0.05):
                 plane = suzanne(asp, mass)
                 x, y = simulate_flight(plane, v0=20.0, theta0=theta, max_time=50)
@@ -157,23 +157,23 @@ if choice == 0:
     np.savetxt("suzanne.csv", ranges_suzanne, delimiter=",")
 
 elif choice == 1:
-    ranges_alkonost = []
+    ranges_nighthawk = []
     for i in range(0, 4):
         mass = MASS + 0.001*i
-        for asp in np.arange(0.8, 5, 0.1):
+        for asp in np.arange(1, 5, 0.1):
             for theta in np.arange(0.5, 1, 0.05):
-                plane = alkonost(asp, mass)
+                plane = nighthawk(asp, mass)
                 x, y = simulate_flight(plane, v0=20.0, theta0=theta, max_time=50)
-                ranges_alkonost.append([asp, x[-1], theta, mass])
+                ranges_nighthawk.append([asp, x[-1], theta, mass])
                 print([asp, x[-1], theta, mass])
 
-    np.savetxt("alkonost.csv", ranges_alkonost, delimiter=",")
+    np.savetxt("nighthawk.csv", ranges_nighthawk, delimiter=",")
 
 elif choice == 2:
     ranges_super = []
     for i in range(0, 4):
         mass = MASS + 0.001*i
-        for asp in np.arange(0.8, 5, 0.1):
+        for asp in np.arange(1, 5, 0.1):
             for theta in np.arange(0.5, 1, 0.05):
                 plane = super_dart(asp, mass)
                 x, y = simulate_flight(plane, v0=20.0, theta0=theta, max_time=50)
@@ -183,15 +183,15 @@ elif choice == 2:
     np.savetxt("super_dart.csv", ranges_super, delimiter=",")
 
 elif choice == 3:
-    ranges_chinese = []
+    ranges_firefly = []
     for i in range(0, 4):
         mass = MASS + 0.001*i
-        for asp in np.arange(0.8, 5, 0.1):
+        for asp in np.arange(1, 5, 0.1):
             for theta in np.arange(0.5, 1, 0.05):
-                plane = chinese_glider(asp, mass)
+                plane = firefly(asp, mass)
                 x, y = simulate_flight(plane, v0=20.0, theta0=theta, max_time=50)
-                ranges_chinese.append([asp, x[-1], theta, mass])
+                ranges_firefly.append([asp, x[-1], theta, mass])
                 print([asp, x[-1], theta, mass])
 
-    np.savetxt("chinese.csv", ranges_chinese, delimiter=",")
+    np.savetxt("Firefly.csv", ranges_firefly, delimiter=",")
 
