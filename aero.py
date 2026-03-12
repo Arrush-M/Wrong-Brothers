@@ -146,9 +146,9 @@ choice = int(input("Enter plane no: "))
 if choice == 0:
     ranges_suzanne = []
     for i in range(0, 4):
-        mass = MASS + 0.01*i
-        for asp in np.linspace(0.8, 5, 52):
-            for theta in np.linspace(0.5, 1, 20):
+        mass = MASS + 0.001*i
+        for asp in np.arange(0.8, 5, 0.1):
+            for theta in np.arange(0.5, 1, 0.05):
                 plane = suzanne(asp, mass)
                 x, y = simulate_flight(plane, v0=20.0, theta0=theta, max_time=50)
                 ranges_suzanne.append([asp, x[-1], theta, mass])
@@ -159,9 +159,9 @@ if choice == 0:
 elif choice == 1:
     ranges_alkonost = []
     for i in range(0, 4):
-        mass = MASS + 0.01*i
-        for asp in np.linspace(0.8, 5, 52):
-            for theta in np.linspace(0.5, 1, 20):
+        mass = MASS + 0.001*i
+        for asp in np.arange(0.8, 5, 0.1):
+            for theta in np.arange(0.5, 1, 0.05):
                 plane = alkonost(asp, mass)
                 x, y = simulate_flight(plane, v0=20.0, theta0=theta, max_time=50)
                 ranges_alkonost.append([asp, x[-1], theta, mass])
@@ -172,9 +172,9 @@ elif choice == 1:
 elif choice == 2:
     ranges_super = []
     for i in range(0, 4):
-        mass = MASS + 0.01*i
-        for asp in np.linspace(0.8, 5, 52):
-            for theta in np.linspace(0.5, 1, 20):
+        mass = MASS + 0.001*i
+        for asp in np.arange(0.8, 5, 0.1):
+            for theta in np.arange(0.5, 1, 0.05):
                 plane = super_dart(asp, mass)
                 x, y = simulate_flight(plane, v0=20.0, theta0=theta, max_time=50)
                 ranges_super.append([asp, x[-1], theta, mass])
@@ -185,9 +185,9 @@ elif choice == 2:
 elif choice == 3:
     ranges_chinese = []
     for i in range(0, 4):
-        mass = MASS + 0.01*i
-        for asp in np.linspace(0.8, 5, 52):
-            for theta in np.linspace(0.5, 1, 20):
+        mass = MASS + 0.001*i
+        for asp in np.arange(0.8, 5, 0.1):
+            for theta in np.arange(0.5, 1, 0.05):
                 plane = chinese_glider(asp, mass)
                 x, y = simulate_flight(plane, v0=20.0, theta0=theta, max_time=50)
                 ranges_chinese.append([asp, x[-1], theta, mass])
