@@ -34,12 +34,12 @@ ax = fig.add_subplot(projection="3d")
 if n == 4:
     c = [row[3] for row in data]
     sc = ax.scatter(x, y, z, c=c, cmap="viridis")
-    plt.colorbar(sc, label="Mass?")
+    plt.colorbar(sc, label="Mass (kg)")
 else:
     ax.scatter(x, y, z)
 
 ax.set_xlabel("Aspect Ratio")
-ax.set_zlabel("Range")
-ax.set_ylabel("Initial Angle")
+ax.set_zlabel("Range (m)")
+ax.set_ylabel("Initial Angle (rad)")
 
 plt.show()
