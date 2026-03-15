@@ -10,11 +10,11 @@ choice = int(input("Enter choice of plane: "))
 if choice == 0:
     filename = "suzanne.csv"
 elif choice == 1:
-    filename = "alkonost.csv"
+    filename = "nighthawk.csv"
 elif choice == 2:
     filename = "super_dart.csv"
 elif choice == 3:
-    filename = "chinese.csv"
+    filename = "Firefly.csv"
 
 # Read CSV
 with open(filename, "r") as f:
